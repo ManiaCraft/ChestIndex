@@ -1,0 +1,8 @@
+author: ManiaCraft
+database: true
+generator: http://dinnerbone.com/minecraft/tools/pluginator/
+main: de.maniacraft.chestindex.Chestindex
+name: ChestIndex
+startup: postworld
+url: http://www.maniacraft.de/
+version: '1.0'
