@@ -1,4 +1,4 @@
-package de.maniacraft.chestindex;
+package de.maniacraft.chestindex.listeners;
 
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
@@ -9,6 +9,8 @@ import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerListener;
 import org.bukkit.inventory.ItemStack;
+
+import de.maniacraft.chestindex.Chestindex;
 
 
 public class ChestPlayerListener extends PlayerListener {
