@@ -6,3 +6,11 @@ name: ChestIndex
 startup: postworld
 url: http://www.maniacraft.de/
 version: '1.0'
+commands:
+  chestindex:
+    aliases: 
+        - ci
+    description: Suche in Chests
+    usage: |
+           /ci search <block> | Sucht nach einem Block
+           /ci tp <id> | Teleportiert zu einer Chest. 

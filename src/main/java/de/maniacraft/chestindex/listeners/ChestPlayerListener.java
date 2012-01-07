@@ -3,6 +3,7 @@ package de.maniacraft.chestindex.listeners;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
+import org.bukkit.block.BlockFace;
 import org.bukkit.block.Chest;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.Action;
@@ -28,6 +29,14 @@ public class ChestPlayerListener extends PlayerListener {
         Block block = event.getClickedBlock();
         int itemamount = 1;
         if (block.getType() == Material.CHEST) {
+            BlockFace[] faces = new BlockFace[]{BlockFace.NORTH, BlockFace.SOUTH, BlockFace.EAST, BlockFace.WEST};
+
+            for (BlockFace blockFace : faces) {
+                Block face = block.getRelative(blockFace);
+                if (face.getType() == Material.CHEST) {
+                	// Double Chest
+                }
+            }
           Chest chest = (Chest)block.getState();
           if (chest.getInventory().contains(Material.valueOf("STONE"), itemamount)){
         	  plugin.sendPlayer(ChatColor.RED+"Eyeyey yiha, da ist ein Stone drin", player);
