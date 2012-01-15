@@ -12,7 +12,7 @@ import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.block.Chest;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
+//import org.bukkit.inventory.ItemStack;
 import de.maniacraft.chestindex.Config;
 
 public class MySQL {

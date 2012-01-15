@@ -10,7 +10,8 @@ public class Config {
 	
     public static void load() {
     	Plugin plugin = getPlugin();
-    	plugin.getConfig().addDefault("Database",			"jdbc:mysql://localhost/database?user=root&password=password");
+    	plugin.getConfig().addDefault("Database", "jdbc:mysql://localhost/database?user=root&password=password");
+    	plugin.getConfig().addDefault("LWC", false);
     	plugin.getConfig().options().copyDefaults(true);
     	plugin.saveConfig();
     }
@@ -22,4 +23,8 @@ public class Config {
     public static Integer getInteger(String key){
     	return getPlugin().getConfig().getInt(key, 0);
     }
+
+	public static boolean getBoolean(String key) {
+		return getPlugin().getConfig().getBoolean(key);
+	}
 }

@@ -39,5 +39,14 @@
             <type>jar</type>
             <scope>provided</scope>
         </dependency>
+        <!-- odditem -->
+         <dependency>
+            <groupId>net.vault</groupId>
+            <artifactId>Vault</artifactId>
+            <version>1.0</version>
+            <type>jar</type>
+            <scope>system</scope>
+            <systemPath>${project.basedir}/lib/Vault.jar</systemPath>
+        </dependency>
     </dependencies>
 </project>
