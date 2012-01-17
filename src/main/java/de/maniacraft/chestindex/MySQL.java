@@ -10,9 +10,12 @@ import java.util.List;
 
 import org.bukkit.*;
 import org.bukkit.block.Block;
+import org.bukkit.block.BlockFace;
 import org.bukkit.block.Chest;
 import org.bukkit.entity.Player;
-//import org.bukkit.inventory.ItemStack;
+
+import com.griefcraft.model.Protection;
+
 import de.maniacraft.chestindex.Config;
 
 public class MySQL {
@@ -21,37 +24,21 @@ public class MySQL {
 	private ResultSet resultSet = null;
 	private PreparedStatement preparedStatement = null;
 
-	public void Connect() {
+	public boolean Connect() {
 		try {
 			Class.forName("com.mysql.jdbc.Driver");
 			connect = DriverManager.getConnection(Config.getString("Database"));
-			if(connect.getWarnings() != null)
-	    		System.out.print(connect.getWarnings().getMessage());;
+			if (connect.getWarnings() != null)
+				Chestindex.sendConsole(connect.getWarnings().getMessage());
+			return true;
 		} catch (Exception e) {
 			e.printStackTrace();
 			close();
+			return false;
 		}
-	}
-
-	public List<String> getList() {
-		List<String> ret = new LinkedList<String>();
-		try {
-			if (connect == null || connect.isClosed()) Connect();
-			Class.forName("com.mysql.jdbc.Driver");
-			statement = connect.createStatement();
-			resultSet = statement.executeQuery(Config.getString("Fetch"));
-			while (resultSet.next()) {
-				ret.add(resultSet.getString(1));
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
-			close();
-		}
-		return ret;
 	}
 
 	public void addChest(Player player, World world, int x, int y, int z) {
-		System.out.println("Inserted Chest entry");
 		try {
 			preparedStatement = connect.prepareStatement("INSERT INTO ci_chests (player, world, x, y, z) VALUES (?, ?, ?, ?, ?)");
 			preparedStatement.setString(1, player.getName());
@@ -61,59 +48,128 @@ public class MySQL {
 			preparedStatement.setInt(5, z);
 			preparedStatement.executeUpdate();
 		} catch (Exception e) {
-			System.out.println(e.toString());
 			e.printStackTrace();
 			close();
 		}
 	}
 
-	public boolean isListed(Player player, int x, int y, int z) {
+	public void removeChest(World world, int x, int y, int z) {
 		try {
-			preparedStatement = connect.prepareStatement("SELECT COUNT(*) as count FROM ci_chests WHERE  x = ? AND y = ? AND z = ?");
+			preparedStatement = connect.prepareStatement("DELETE FROM ci_chests WHERE world = ? AND x = ? AND y = ? AND z = ?");
+			preparedStatement.setString(1, world.getName());
+			preparedStatement.setInt(2, x);
+			preparedStatement.setInt(3, y);
+			preparedStatement.setInt(4, z);
+			preparedStatement.executeUpdate();
+		} catch (Exception e) {
+			Chestindex.sendConsole(Chestindex.prefix + " Error on removing Chest from Database.");
+			e.printStackTrace();
+			close();
+		}
+	}
+
+	public boolean isListed(World world, int x, int y, int z, String player) {
+		try {
+			preparedStatement = connect.prepareStatement("SELECT COUNT(*) as count FROM ci_chests WHERE  x = ? AND y = ? AND z = ? AND wordl = ? AND player = ?");
 			preparedStatement.setInt(1, x);
 			preparedStatement.setInt(2, y);
 			preparedStatement.setInt(3, z);
+			preparedStatement.setString(4, world.getName());
+			preparedStatement.setString(5, player);
 			ResultSet set = preparedStatement.executeQuery();
-            if (set.next()) {
-              int count = set.getInt("count");
-              if(count != 0) 
-              return true;
-            }
-            set.close();
+			if (set.next()) {
+				int count = set.getInt("count");
+				if (count != 0)
+					return true;
+			}
+			set.close();
 		} catch (Exception e) {
-			System.out.println(e.toString());
+			Chestindex.sendConsole(Chestindex.prefix + " Error on checking Chests in Database.");
 			e.printStackTrace();
-			//close();
-		} 
+			// close();
+		}
 		return false;
 	}
-	
+
+	public boolean isListed(World world, int x, int y, int z) {
+		try {
+			preparedStatement = connect.prepareStatement("SELECT COUNT(*) as count FROM ci_chests WHERE  x = ? AND y = ? AND z = ? AND wordl = ?");
+			preparedStatement.setInt(1, x);
+			preparedStatement.setInt(2, y);
+			preparedStatement.setInt(3, z);
+			preparedStatement.setString(4, world.getName());
+			ResultSet set = preparedStatement.executeQuery();
+			if (set.next()) {
+				int count = set.getInt("count");
+				if (count != 0)
+					return true;
+			}
+			set.close();
+		} catch (Exception e) {
+			Chestindex.sendConsole(Chestindex.prefix + " Error on checking Chests in Database.");
+			e.printStackTrace();
+			// close();
+		}
+		return false;
+	}
+
 	public List<Chest> getChests(String player) {
 		List<Chest> ret = new LinkedList<Chest>();
-		try {
-			preparedStatement = connect.prepareStatement("SELECT world, x, y, z, player FROM ci_chests WHERE player = ?");
-			preparedStatement.setString(1, player);
-			resultSet = preparedStatement.executeQuery();
-			while (resultSet.next()) {
-				World world = Bukkit.getWorld(resultSet.getString(1));
-				System.out.println("+***" + resultSet.getString(1) + " ## # "+ resultSet.getInt(2)+ " ## # "+ resultSet.getInt(3)+ " ## # "+ resultSet.getInt(4));
-				Block block = world.getBlockAt(resultSet.getInt(2), resultSet.getInt(3), resultSet.getInt(4));
-				//Block block = (resultSet.getInt(2), resultSet.getInt(3), resultSet.getInt(4));
-				Chest chest = (Chest)block.getState();
-				ret.add(chest);
-				//ItemStack[] inventory = chest.getInventory().getContents();
+		if (!Chestindex.LWC) {
+			try {
+				preparedStatement = connect.prepareStatement("SELECT world, x, y, z, player FROM ci_chests WHERE player = ?");
+				preparedStatement.setString(1, player);
+				resultSet = preparedStatement.executeQuery();
+				while (resultSet.next()) {
+					World world = Bukkit.getWorld(resultSet.getString(1));
+					Block block = world.getBlockAt(resultSet.getInt(2), resultSet.getInt(3), resultSet.getInt(4));
+					if (block.getType() == Material.CHEST) {
+						Chest chest = (Chest) block.getState();
+						ret.add(chest);
+					} else {
+						removeChest(world, resultSet.getInt(2), resultSet.getInt(3), resultSet.getInt(4));
+						Chestindex.sendConsole(Chestindex.prefix + " Removing Database Entry for Chest at " + resultSet.getInt(2) + " " + resultSet.getInt(3) + " " + resultSet.getInt(4));
+					}
+				}
+				resultSet.close();
+				return ret;
+			} catch (Exception e) {
+				Chestindex.sendConsole(Chestindex.prefix + " Error on getting Chests from Database.");
+				e.printStackTrace();
+				// close();
+				return null;
 			}
-			resultSet.close();
-			return ret;
-		} catch (Exception e) {
-			System.out.println("Fehler.");
-			System.out.println(e.toString());
-			e.printStackTrace();
-			//close();
-			return null;
+		} else {
+			List<Protection> protections = Chestindex.lwc.getPhysicalDatabase().loadProtectionsByPlayer(player);
+			try {
+				for (Protection protection : protections) {
+					World world = Bukkit.getWorld(protection.getWorld());
+					Block block = world.getBlockAt(protection.getX(), protection.getY(), protection.getZ());
+					if (block.getType() == Material.CHEST) {
+						BlockFace[] faces = new BlockFace[] { BlockFace.NORTH, BlockFace.SOUTH, BlockFace.EAST, BlockFace.WEST };
+
+						// Double Chest (LWC)
+						for (BlockFace blockFace : faces) {
+							Block face = block.getRelative(blockFace);
+							if (face.getType() == Material.CHEST) {
+								Chest chest = (Chest) face.getState();
+								ret.add(chest);
+							}
+						}
+						Chest chest = (Chest) block.getState();
+						ret.add(chest);
+					}
+				}
+				return ret;
+			} catch (Exception e) {
+				Chestindex.sendConsole(Chestindex.prefix + " Error on getting Chests from LWC.");
+				e.printStackTrace();
+				// close();
+				return null;
+			}
 		}
 	}
-	
+
 	private void close() {
 		try {
 			if (resultSet != null) {

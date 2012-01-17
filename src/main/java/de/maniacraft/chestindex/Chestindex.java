@@ -26,9 +26,11 @@ import org.bukkit.event.Event.Priority;
 import org.bukkit.event.Event;
 //import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
+import com.griefcraft.lwc.*;
 
 public class Chestindex extends JavaPlugin {
 
@@ -38,26 +40,37 @@ public class Chestindex extends JavaPlugin {
 	public static final String prefix = "[ChestIndex]";
 	public static final String version = "1.0";
 	public static boolean LWC;
+	public static LWC lwc = null;
 	public MySQL DB = new MySQL();
 	private Hashtable<String, Vector<IndexChest>> data = new Hashtable<String, Vector<IndexChest>>();
 
 	public void onDisable() {
-		System.out.println(prefix + " Version " + version + " disabled!");
+		sendConsole(prefix + " Version " + version + " disabled!");
 	}
 
 	public void onEnable() {
 		Config.load();
-		DB.Connect();
 		PluginManager pm = getServer().getPluginManager();
-		LWC = Config.getBoolean("LWC");
+		Plugin lwcPlugin = getServer().getPluginManager().getPlugin("LWC");
+		if (lwcPlugin != null && Config.getBoolean("LWC")) {
+			LWC = true;
+			lwc = ((LWCPlugin) lwcPlugin).getLWC();
+			sendConsole(prefix + " Using LWC Plugin!");
+		} else {
+			LWC = false;
+			if (DB.Connect())
+				sendConsole(prefix + " Database connection succesfully etablished!");
+			else
+				sendConsole(prefix + " Database connection failed!");
+		}
 		// Register Events
 		pm.registerEvent(Event.Type.PLAYER_INTERACT, playerListener, Priority.Normal, this);
 		pm.registerEvent(Event.Type.BLOCK_BREAK, blockListener, Priority.Normal, this);
 		pm.registerEvent(Event.Type.BLOCK_PLACE, blockListener, Priority.Normal, this);
-		System.out.println(prefix + " Version " + version + " enabled!");
+		sendConsole(prefix + " Version " + version + " enabled!");
 	}
 
-	public void sendConsole(String text) {
+	public static void sendConsole(String text) {
 		System.out.println(text);
 	}
 
@@ -70,10 +83,6 @@ public class Chestindex extends JavaPlugin {
 	}
 
 	public ItemStack[] getChestContent(Block block) {
-		/*
-		 * BlockFace[] faces = new BlockFace[]{BlockFace.NORTH, BlockFace.SOUTH, BlockFace.EAST, BlockFace.WEST}; for (BlockFace blockFace : faces) { Block face = block.getRelative(blockFace); if (face.getType() == Material.CHEST) { // Double Chest Chest chest2 = (Chest)face.getState(); inventory =
-		 * chest2.getInventory().getContents(); } }
-		 */
 		Chest chest = (Chest) block.getState();
 		ItemStack[] inventory = chest.getInventory().getContents();
 		return inventory;
@@ -85,8 +94,8 @@ public class Chestindex extends JavaPlugin {
 
 		if (commandName.compareToIgnoreCase("chestindex") == 0) {
 			if (args.length == 0) {
-				sender.sendMessage(prefix + ChatColor.WHITE + " /ci search <Block> - Search for <Block> in your Chests.");
-				sender.sendMessage(prefix + ChatColor.WHITE + " /ci teleport <ID> - Telport to Chest <ID>");
+				sendPlayer(prefix + ChatColor.WHITE + " /ci search <Block> - Search for <Block> in your Chests.", player);
+				sendPlayer(prefix + ChatColor.WHITE + " /ci teleport <ID> - Telport to Chest <ID>", player);
 			} else if (args.length > 1) {
 				if (args[0].equalsIgnoreCase("search") || args[0].equalsIgnoreCase("s") && Material.getMaterial(args[1]) != null) {
 					Vector<IndexChest> chestVec = new Vector<IndexChest>();
@@ -112,24 +121,24 @@ public class Chestindex extends JavaPlugin {
 								}
 							}
 						} catch (Exception e) {
-							System.out.println(prefix + " Error on handling Chestindex Command search.");
+							sendConsole(prefix + " Error on handling Chestindex Command search.");
 						}
 					}
 					// Output List
 					for (int y = 0; y < chestVec.size(); y++) {
 						IndexChest chest = chestVec.get(y);
-						sender.sendMessage(y + ": " + chest.item + " " + chest.amount + " stk.");
+						sendPlayer(y + ": " + chest.item + " " + chest.amount + " stk.", player);
 					}
 				} else if (args[0].equalsIgnoreCase("teleport") || args[0].equalsIgnoreCase("tp") && isNumeric(args[1])) {
 					try {
 						Vector<IndexChest> chestVec = data.get(sender.getName());
 						IndexChest chest = chestVec.get(Integer.parseInt(args[1]));
-						sender.sendMessage("TELEPORT to Chest " + args[1] + ": " + chest.item + " " + chest.amount + " stk.");
+						sendPlayer("TELEPORT to Chest " + args[1] + ": " + chest.item + " " + chest.amount + " stk.", player);
 						World world = Bukkit.getWorld(chest.world);
 						Location to = new Location(world, chest.x, chest.y, chest.z);
 						player.teleport(to);
 					} catch (Exception e) {
-						System.out.println("Error on handling Chestindex Command tp.");
+						sendConsole("Error on handling Chestindex Command tp.");
 					}
 				}
 			}

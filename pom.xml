@@ -48,5 +48,13 @@
             <scope>system</scope>
             <systemPath>${project.basedir}/lib/Vault.jar</systemPath>
         </dependency>
+         <dependency>
+            <groupId>net.vault</groupId>
+            <artifactId>Vault</artifactId>
+            <version>1.0</version>
+            <type>jar</type>
+            <scope>system</scope>
+            <systemPath>${project.basedir}/lib/LWC.jar</systemPath>
+        </dependency>
     </dependencies>
 </project>
