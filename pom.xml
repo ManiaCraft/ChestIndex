@@ -49,7 +49,7 @@
             <systemPath>${project.basedir}/lib/Vault.jar</systemPath>
         </dependency>
          <dependency>
-            <groupId>org.lwc</groupId>
+            <groupId>net.lwc</groupId>
             <artifactId>Vault</artifactId>
             <version>1.0</version>
             <type>jar</type>
