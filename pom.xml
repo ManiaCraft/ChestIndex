@@ -50,7 +50,7 @@
         </dependency>
          <dependency>
             <groupId>net.LWC</groupId>
-            <artifactId>Vault</artifactId>
+            <artifactId>LWC</artifactId>
             <version>1.0</version>
             <type>jar</type>
             <scope>system</scope>
