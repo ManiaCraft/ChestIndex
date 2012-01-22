@@ -67,7 +67,25 @@ public class MySQL {
 			close();
 		}
 	}
-
+	
+	public void editChest(World world, int from_x, int from_y, int from_z, int to_x, int to_y, int to_z) {
+		try {
+			preparedStatement = connect.prepareStatement("UPDATE ci_chests SET x = ?, y = ?, z = ? WHERE world = ? AND x = ? AND y = ? AND z = ?");
+			preparedStatement.setString(1, world.getName());
+			preparedStatement.setInt(2, to_x);
+			preparedStatement.setInt(3, to_y);
+			preparedStatement.setInt(4, to_z);
+			preparedStatement.setInt(5, from_x);
+			preparedStatement.setInt(6, from_y);
+			preparedStatement.setInt(7, from_z);
+			preparedStatement.executeUpdate();
+		} catch (Exception e) {
+			Chestindex.sendConsole(Chestindex.prefix + " Error on updating Chest at Database.");
+			e.printStackTrace();
+			close();
+		}
+	}
+	
 	public boolean isListed(World world, int x, int y, int z, String player) {
 		try {
 			preparedStatement = connect.prepareStatement("SELECT COUNT(*) as count FROM ci_chests WHERE  x = ? AND y = ? AND z = ? AND world = ? AND player = ?");

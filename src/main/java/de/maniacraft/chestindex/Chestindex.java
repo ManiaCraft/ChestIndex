@@ -62,9 +62,9 @@ public class Chestindex extends JavaPlugin {
 				sendConsole(prefix + " Database connection failed!");
 		}
 		// Register Events
-		//pm.registerEvent(Event.Type.PLAYER_INTERACT, playerListener, Priority.Normal, this);
-		//pm.registerEvent(Event.Type.BLOCK_BREAK, blockListener, Priority.Normal, this);
-		//pm.registerEvent(Event.Type.BLOCK_PLACE, blockListener, Priority.Normal, this);
+		// pm.registerEvent(Event.Type.PLAYER_INTERACT, playerListener, Priority.Normal, this);
+		// pm.registerEvent(Event.Type.BLOCK_BREAK, blockListener, Priority.Normal, this);
+		// pm.registerEvent(Event.Type.BLOCK_PLACE, blockListener, Priority.Normal, this);
 		pm.registerEvents(playerListener, this);
 		pm.registerEvents(blockListener, this);
 		sendConsole(prefix + " Version " + version + " enabled!");
@@ -97,37 +97,54 @@ public class Chestindex extends JavaPlugin {
 				sendPlayer(prefix + ChatColor.WHITE + " /ci search <Block> - Search for <Block> in your Chests.", player);
 				sendPlayer(prefix + ChatColor.WHITE + " /ci teleport <ID> - Telport to Chest <ID>", player);
 			} else if (args.length > 1) {
-				if (args[0].equalsIgnoreCase("search") || args[0].equalsIgnoreCase("s") && Material.getMaterial(args[1]) != null) {
-					Vector<IndexChest> chestVec = new Vector<IndexChest>();
-					data.put(sender.getName(), chestVec);
-
-					List<Chest> chests = DB.getChests(sender.getName());
-					for (Chest chest : chests) {
-						try {
-							if (!chest.getInventory().contains(Material.valueOf(args[1])))
-								continue;
-							ItemStack[] inventory = chest.getInventory().getContents();
-							IndexChest found = new IndexChest(chest.getWorld().getName(), chest.getX(), chest.getY(), chest.getZ(), 0, args[1]);
-							chestVec.add(found);
-							for (ItemStack x : inventory) {
-								if (x == null)
-									continue;
-								if (x.getType().equals(Material.valueOf(args[1]))) {
-									// sendConsole(x.getType() + " - " + x.getAmount());
-									// IndexChest[] found = new IndexChest[];
-									// arrays.put($user, new IndexChest(chest.getX(),chest.getY(), chest.getZ(), x.getAmount()));
-									// sender.sendMessage(0 + ": " + args[1] + " " + found.amount + " stk.");
-									found.amount += x.getAmount();
-								}
-							}
-						} catch (Exception e) {
-							sendConsole(prefix + " Error on handling Chestindex Command search.");
-						}
+				if (args[0].equalsIgnoreCase("search") || args[0].equalsIgnoreCase("s")) {
+					String searchfor;
+					if (isNumeric(args[1])) {
+						searchfor = args[1];
+					} else {
+			    	    StringBuffer result = new StringBuffer();
+				        result.append(args[1]);
+				        if (args.length > 2) {
+					        for (int i=2; i < args.length; i++) {
+					            result.append("_");
+					            result.append(args[i]);
+					        }
+				        }
+						searchfor = result.toString().toUpperCase().replace(" ", "_");
+						System.out.println(searchfor);
 					}
-					// Output List
-					for (int y = 0; y < chestVec.size(); y++) {
-						IndexChest chest = chestVec.get(y);
-						sendPlayer(y + ": " + chest.item + " " + chest.amount + " stk.", player);
+					if (Material.getMaterial(searchfor) != null) {
+						Vector<IndexChest> chestVec = new Vector<IndexChest>();
+						data.put(sender.getName(), chestVec);
+
+						List<Chest> chests = DB.getChests(sender.getName());
+						for (Chest chest : chests) {
+							try {
+								if (!chest.getInventory().contains(Material.valueOf(searchfor)))
+									continue;
+								ItemStack[] inventory = chest.getInventory().getContents();
+								IndexChest found = new IndexChest(chest.getWorld().getName(), chest.getX(), chest.getY(), chest.getZ(), 0, args[1]);
+								chestVec.add(found);
+								for (ItemStack x : inventory) {
+									if (x == null)
+										continue;
+									if (x.getType().equals(Material.valueOf(searchfor))) {
+										// sendConsole(x.getType() + " - " + x.getAmount());
+										// IndexChest[] found = new IndexChest[];
+										// arrays.put($user, new IndexChest(chest.getX(),chest.getY(), chest.getZ(), x.getAmount()));
+										// sender.sendMessage(0 + ": " + args[1] + " " + found.amount + " stk.");
+										found.amount += x.getAmount();
+									}
+								}
+							} catch (Exception e) {
+								sendConsole(prefix + " Error on handling Chestindex Command search.");
+							}
+						}
+						// Output List
+						for (int y = 0; y < chestVec.size(); y++) {
+							IndexChest chest = chestVec.get(y);
+							sendPlayer(y + ": " + chest.item + " " + chest.amount + " stk.", player);
+						}
 					}
 				} else if (args[0].equalsIgnoreCase("teleport") || args[0].equalsIgnoreCase("tp") && isNumeric(args[1])) {
 					try {
