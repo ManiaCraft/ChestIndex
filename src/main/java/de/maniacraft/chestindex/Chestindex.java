@@ -19,6 +19,7 @@ import de.maniacraft.chestindex.listeners.ChestBlockListener;
 import de.maniacraft.chestindex.listeners.ChestPlayerListener;
 
 import org.bukkit.block.Block;
+import org.bukkit.block.BlockFace;
 //import org.bukkit.block.BlockFace;
 import org.bukkit.block.Chest;
 import org.bukkit.entity.Player;
@@ -91,7 +92,6 @@ public class Chestindex extends JavaPlugin {
 	public boolean onCommand(CommandSender sender, Command command, String commandLabel, String[] args) {
 		String commandName = command.getName().toLowerCase();
 		Player player = (Player) sender;
-
 		if (commandName.compareToIgnoreCase("chestindex") == 0) {
 			if (args.length == 0) {
 				sendPlayer(prefix + ChatColor.WHITE + " /ci search <Block> - Search for <Block> in your Chests.", player);
@@ -120,11 +120,44 @@ public class Chestindex extends JavaPlugin {
 						List<Chest> chests = DB.getChests(sender.getName());
 						for (Chest chest : chests) {
 							try {
+								IndexChest found = null;
+								boolean doublechest = false;
+								World world_chest1 = chest.getWorld();
+								Block block_chest1 =  world_chest1.getBlockAt(chest.getX(), chest.getY(), chest.getZ());
+								BlockFace[] faces = new BlockFace[] { BlockFace.NORTH, BlockFace.SOUTH, BlockFace.EAST, BlockFace.WEST };
+
+								// Double Chest (LWC)
+								for (BlockFace blockFace : faces) {
+									Block face = block_chest1.getRelative(blockFace);
+									if (face.getType() == Material.CHEST) {
+										Chest chest2 = (Chest) face.getState();
+										if(chest2.getInventory().contains(Material.valueOf(searchfor))) {
+											ItemStack[] inventory = chest2.getInventory().getContents();
+											found = new IndexChest(chest2.getWorld().getName(), chest2.getX(), chest2.getY(), chest2.getZ(), 0, args[1]);
+											chestVec.add(found);
+											for (ItemStack x : inventory) {
+												if (x == null)
+													continue;
+												if (x.getType().equals(Material.valueOf(searchfor))) {
+													// sendConsole(x.getType() + " - " + x.getAmount());
+													// IndexChest[] found = new IndexChest[];
+													// arrays.put($user, new IndexChest(chest.getX(),chest.getY(), chest.getZ(), x.getAmount()));
+													// sender.sendMessage(0 + ": " + args[1] + " " + found.amount + " stk.");
+													found.amount += x.getAmount();
+												}
+											}
+											doublechest = true;
+										}
+										break;
+									}
+								}
 								if (!chest.getInventory().contains(Material.valueOf(searchfor)))
 									continue;
 								ItemStack[] inventory = chest.getInventory().getContents();
-								IndexChest found = new IndexChest(chest.getWorld().getName(), chest.getX(), chest.getY(), chest.getZ(), 0, args[1]);
-								chestVec.add(found);
+								if(!doublechest) {
+									found = new IndexChest(chest.getWorld().getName(), chest.getX(), chest.getY(), chest.getZ(), 0, args[1]);
+									chestVec.add(found);
+								}
 								for (ItemStack x : inventory) {
 									if (x == null)
 										continue;

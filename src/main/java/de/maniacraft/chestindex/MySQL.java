@@ -164,7 +164,7 @@ public class MySQL {
 					World world = Bukkit.getWorld(protection.getWorld());
 					Block block = world.getBlockAt(protection.getX(), protection.getY(), protection.getZ());
 					if (block.getType() == Material.CHEST) {
-						BlockFace[] faces = new BlockFace[] { BlockFace.NORTH, BlockFace.SOUTH, BlockFace.EAST, BlockFace.WEST };
+						/*BlockFace[] faces = new BlockFace[] { BlockFace.NORTH, BlockFace.SOUTH, BlockFace.EAST, BlockFace.WEST };
 
 						// Double Chest (LWC)
 						for (BlockFace blockFace : faces) {
@@ -173,7 +173,7 @@ public class MySQL {
 								Chest chest = (Chest) face.getState();
 								ret.add(chest);
 							}
-						}
+						}*/
 						Chest chest = (Chest) block.getState();
 						ret.add(chest);
 					}

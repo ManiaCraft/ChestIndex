@@ -40,6 +40,7 @@ public class ChestBlockListener implements Listener {
 					Block face = block.getRelative(blockFace);
 					if (face.getType() == Material.CHEST) {
 						block2 = face;
+						break;
 					}
 				}
 				// Remove or edit Chestentry
@@ -76,6 +77,7 @@ public class ChestBlockListener implements Listener {
 					Block face = block.getRelative(blockFace);
 					if (face.getType() == Material.CHEST) {
 						block2 = face;
+						break;
 					}
 				}
 				
