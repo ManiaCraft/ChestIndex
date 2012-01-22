@@ -4,14 +4,17 @@ import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
+import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
-import org.bukkit.event.block.BlockListener;
+//import org.bukkit.event.block.BlockListener;
 
 import org.bukkit.event.block.BlockPlaceEvent;
 
 import de.maniacraft.chestindex.Chestindex;
 
-public class ChestBlockListener extends BlockListener {
+public class ChestBlockListener implements Listener {
 
 	private final Chestindex plugin;
 
@@ -19,7 +22,7 @@ public class ChestBlockListener extends BlockListener {
 		plugin = instance;
 	}
 
-	@Override
+	@EventHandler(priority = EventPriority.NORMAL)
 	public void onBlockBreak(BlockBreakEvent event) {
 		if (!Chestindex.LWC) {
 			Block block = event.getBlock();
@@ -30,7 +33,7 @@ public class ChestBlockListener extends BlockListener {
 		}
 	}
 
-	@Override
+	@EventHandler(priority = EventPriority.NORMAL)
 	public void onBlockPlace(BlockPlaceEvent event) {
 		if (event.isCancelled()) {
 			return;

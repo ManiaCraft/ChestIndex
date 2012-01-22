@@ -4,13 +4,16 @@ import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
+import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
-import org.bukkit.event.player.PlayerListener;
+//import org.bukkit.event.player.PlayerListener;
 
 import de.maniacraft.chestindex.Chestindex;
 
-public class ChestPlayerListener extends PlayerListener {
+public class ChestPlayerListener implements Listener {
 
 	private final Chestindex plugin;
 
@@ -18,7 +21,7 @@ public class ChestPlayerListener extends PlayerListener {
 		plugin = instance;
 	}
 
-	@Override
+	@EventHandler(priority = EventPriority.NORMAL)
 	public void onPlayerInteract(PlayerInteractEvent event) {
 		Action action = event.getAction();
 		Player player = event.getPlayer();

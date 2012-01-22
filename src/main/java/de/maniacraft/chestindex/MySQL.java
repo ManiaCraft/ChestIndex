@@ -70,7 +70,7 @@ public class MySQL {
 
 	public boolean isListed(World world, int x, int y, int z, String player) {
 		try {
-			preparedStatement = connect.prepareStatement("SELECT COUNT(*) as count FROM ci_chests WHERE  x = ? AND y = ? AND z = ? AND wordl = ? AND player = ?");
+			preparedStatement = connect.prepareStatement("SELECT COUNT(*) as count FROM ci_chests WHERE  x = ? AND y = ? AND z = ? AND world = ? AND player = ?");
 			preparedStatement.setInt(1, x);
 			preparedStatement.setInt(2, y);
 			preparedStatement.setInt(3, z);
@@ -93,7 +93,7 @@ public class MySQL {
 
 	public boolean isListed(World world, int x, int y, int z) {
 		try {
-			preparedStatement = connect.prepareStatement("SELECT COUNT(*) as count FROM ci_chests WHERE  x = ? AND y = ? AND z = ? AND wordl = ?");
+			preparedStatement = connect.prepareStatement("SELECT COUNT(*) as count FROM ci_chests WHERE  x = ? AND y = ? AND z = ? AND world = ?");
 			preparedStatement.setInt(1, x);
 			preparedStatement.setInt(2, y);
 			preparedStatement.setInt(3, z);

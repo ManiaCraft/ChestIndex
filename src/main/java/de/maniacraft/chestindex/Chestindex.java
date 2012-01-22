@@ -22,8 +22,6 @@ import org.bukkit.block.Block;
 //import org.bukkit.block.BlockFace;
 import org.bukkit.block.Chest;
 import org.bukkit.entity.Player;
-import org.bukkit.event.Event.Priority;
-import org.bukkit.event.Event;
 //import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.Plugin;
@@ -64,9 +62,11 @@ public class Chestindex extends JavaPlugin {
 				sendConsole(prefix + " Database connection failed!");
 		}
 		// Register Events
-		pm.registerEvent(Event.Type.PLAYER_INTERACT, playerListener, Priority.Normal, this);
-		pm.registerEvent(Event.Type.BLOCK_BREAK, blockListener, Priority.Normal, this);
-		pm.registerEvent(Event.Type.BLOCK_PLACE, blockListener, Priority.Normal, this);
+		//pm.registerEvent(Event.Type.PLAYER_INTERACT, playerListener, Priority.Normal, this);
+		//pm.registerEvent(Event.Type.BLOCK_BREAK, blockListener, Priority.Normal, this);
+		//pm.registerEvent(Event.Type.BLOCK_PLACE, blockListener, Priority.Normal, this);
+		pm.registerEvents(playerListener, this);
+		pm.registerEvents(blockListener, this);
 		sendConsole(prefix + " Version " + version + " enabled!");
 	}
 
