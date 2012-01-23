@@ -7,15 +7,13 @@ import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.LinkedList;
 import java.util.List;
-
-import org.bukkit.*;
+import org.bukkit.Bukkit;
+import org.bukkit.Material;
+import org.bukkit.World;
 import org.bukkit.block.Block;
-import org.bukkit.block.BlockFace;
 import org.bukkit.block.Chest;
 import org.bukkit.entity.Player;
-
 import com.griefcraft.model.Protection;
-
 import de.maniacraft.chestindex.Config;
 
 public class MySQL {
@@ -33,7 +31,7 @@ public class MySQL {
 			return true;
 		} catch (Exception e) {
 			e.printStackTrace();
-			close();
+			//close();
 			return false;
 		}
 	}
@@ -49,7 +47,7 @@ public class MySQL {
 			preparedStatement.executeUpdate();
 		} catch (Exception e) {
 			e.printStackTrace();
-			close();
+			//close();
 		}
 	}
 
@@ -64,17 +62,17 @@ public class MySQL {
 		} catch (Exception e) {
 			Chestindex.sendConsole(Chestindex.prefix + " Error on removing Chest from Database.");
 			e.printStackTrace();
-			close();
+			//close();
 		}
 	}
 	
 	public void editChest(World world, int from_x, int from_y, int from_z, int to_x, int to_y, int to_z) {
 		try {
 			preparedStatement = connect.prepareStatement("UPDATE ci_chests SET x = ?, y = ?, z = ? WHERE world = ? AND x = ? AND y = ? AND z = ?");
-			preparedStatement.setString(1, world.getName());
-			preparedStatement.setInt(2, to_x);
-			preparedStatement.setInt(3, to_y);
-			preparedStatement.setInt(4, to_z);
+			preparedStatement.setInt(1, to_x);
+			preparedStatement.setInt(2, to_y);
+			preparedStatement.setInt(3, to_z);
+			preparedStatement.setString(4, world.getName());
 			preparedStatement.setInt(5, from_x);
 			preparedStatement.setInt(6, from_y);
 			preparedStatement.setInt(7, from_z);
@@ -82,7 +80,7 @@ public class MySQL {
 		} catch (Exception e) {
 			Chestindex.sendConsole(Chestindex.prefix + " Error on updating Chest at Database.");
 			e.printStackTrace();
-			close();
+			//close();
 		}
 	}
 	
@@ -104,7 +102,7 @@ public class MySQL {
 		} catch (Exception e) {
 			Chestindex.sendConsole(Chestindex.prefix + " Error on checking Chests in Database.");
 			e.printStackTrace();
-			// close();
+			//close();
 		}
 		return false;
 	}
@@ -164,7 +162,8 @@ public class MySQL {
 					World world = Bukkit.getWorld(protection.getWorld());
 					Block block = world.getBlockAt(protection.getX(), protection.getY(), protection.getZ());
 					if (block.getType() == Material.CHEST) {
-						/*BlockFace[] faces = new BlockFace[] { BlockFace.NORTH, BlockFace.SOUTH, BlockFace.EAST, BlockFace.WEST };
+						/*
+						BlockFace[] faces = new BlockFace[] { BlockFace.NORTH, BlockFace.SOUTH, BlockFace.EAST, BlockFace.WEST };
 
 						// Double Chest (LWC)
 						for (BlockFace blockFace : faces) {
@@ -173,7 +172,8 @@ public class MySQL {
 								Chest chest = (Chest) face.getState();
 								ret.add(chest);
 							}
-						}*/
+						}
+						*/
 						Chest chest = (Chest) block.getState();
 						ret.add(chest);
 					}

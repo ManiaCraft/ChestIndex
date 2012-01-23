@@ -9,10 +9,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
-//import org.bukkit.event.block.BlockListener;
-
 import org.bukkit.event.block.BlockPlaceEvent;
-
 import de.maniacraft.chestindex.Chestindex;
 
 public class ChestBlockListener implements Listener {
@@ -80,7 +77,6 @@ public class ChestBlockListener implements Listener {
 						break;
 					}
 				}
-				
 				// Entweder Doppelchest, aber Chest2 ist nicht gelistet, oder Einzelchest -> trage ein
 				if (block2 == null || !plugin.DB.isListed(world, block2.getX(), block2.getY(), block2.getZ())) {
 					plugin.DB.addChest(player, world, block.getX(), block.getY(), block.getZ());

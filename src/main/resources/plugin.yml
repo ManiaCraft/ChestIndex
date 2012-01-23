@@ -12,5 +12,6 @@ commands:
         - ci
     description: Suche in Chests
     usage: |
-           /ci search <block> | Sucht nach einem Block
+           /ci search <block> | Sucht nach einem Block.
+           /ci list <Pageid> | Zeigt die Ergebnisse der letzen Suche.
            /ci tp <id> | Teleportiert zu einer Chest. 

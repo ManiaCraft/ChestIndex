@@ -1,9 +1,7 @@
 package de.maniacraft.chestindex;
 
 import java.util.Hashtable;
-//import java.util.LinkedList;
 import java.util.List;
-//import java.util.Stack;
 import java.util.Vector;
 import java.util.logging.Logger;
 
@@ -20,10 +18,8 @@ import de.maniacraft.chestindex.listeners.ChestPlayerListener;
 
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
-//import org.bukkit.block.BlockFace;
 import org.bukkit.block.Chest;
 import org.bukkit.entity.Player;
-//import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.PluginManager;
@@ -63,9 +59,6 @@ public class Chestindex extends JavaPlugin {
 				sendConsole(prefix + " Database connection failed!");
 		}
 		// Register Events
-		// pm.registerEvent(Event.Type.PLAYER_INTERACT, playerListener, Priority.Normal, this);
-		// pm.registerEvent(Event.Type.BLOCK_BREAK, blockListener, Priority.Normal, this);
-		// pm.registerEvent(Event.Type.BLOCK_PLACE, blockListener, Priority.Normal, this);
 		pm.registerEvents(playerListener, this);
 		pm.registerEvents(blockListener, this);
 		sendConsole(prefix + " Version " + version + " enabled!");
@@ -89,6 +82,26 @@ public class Chestindex extends JavaPlugin {
 		return inventory;
 	}
 
+	public void sendList(int offset, Vector<IndexChest> chestVec, Player player) {
+		try {
+			int sum;
+			if (chestVec.size() >= (offset + 10))
+				sum = 10;
+			else
+				sum = (chestVec.size() - offset);
+
+			for (int y = offset; y < (sum + offset); y++) {
+				IndexChest chest = chestVec.get(y);
+				sendPlayer(y + ": " + chest.item + " " + chest.amount + " stk.", player);
+			}
+			double site = (Math.floor(10 + offset) / 10);
+			int sites = (chestVec.size() / 10 + 1);
+			sendPlayer("Es wurden " + chestVec.size() + " Ergebnisse gefunden. Zeige Seite " + (int) site + " von " + sites, player);
+		} catch (Exception e) {
+			sendPlayer("Fehler. Es wurden keine Ergebnisse gefunden.", player);
+		}
+	}
+
 	public boolean onCommand(CommandSender sender, Command command, String commandLabel, String[] args) {
 		String commandName = command.getName().toLowerCase();
 		Player player = (Player) sender;
@@ -102,16 +115,15 @@ public class Chestindex extends JavaPlugin {
 					if (isNumeric(args[1])) {
 						searchfor = args[1];
 					} else {
-			    	    StringBuffer result = new StringBuffer();
-				        result.append(args[1]);
-				        if (args.length > 2) {
-					        for (int i=2; i < args.length; i++) {
-					            result.append("_");
-					            result.append(args[i]);
-					        }
-				        }
+						StringBuffer result = new StringBuffer();
+						result.append(args[1]);
+						if (args.length > 2) {
+							for (int i = 2; i < args.length; i++) {
+								result.append("_");
+								result.append(args[i]);
+							}
+						}
 						searchfor = result.toString().toUpperCase().replace(" ", "_");
-						System.out.println(searchfor);
 					}
 					if (Material.getMaterial(searchfor) != null) {
 						Vector<IndexChest> chestVec = new Vector<IndexChest>();
@@ -123,7 +135,7 @@ public class Chestindex extends JavaPlugin {
 								IndexChest found = null;
 								boolean doublechest = false;
 								World world_chest1 = chest.getWorld();
-								Block block_chest1 =  world_chest1.getBlockAt(chest.getX(), chest.getY(), chest.getZ());
+								Block block_chest1 = world_chest1.getBlockAt(chest.getX(), chest.getY(), chest.getZ());
 								BlockFace[] faces = new BlockFace[] { BlockFace.NORTH, BlockFace.SOUTH, BlockFace.EAST, BlockFace.WEST };
 
 								// Double Chest (LWC)
@@ -131,7 +143,7 @@ public class Chestindex extends JavaPlugin {
 									Block face = block_chest1.getRelative(blockFace);
 									if (face.getType() == Material.CHEST) {
 										Chest chest2 = (Chest) face.getState();
-										if(chest2.getInventory().contains(Material.valueOf(searchfor))) {
+										if (chest2.getInventory().contains(Material.valueOf(searchfor))) {
 											ItemStack[] inventory = chest2.getInventory().getContents();
 											found = new IndexChest(chest2.getWorld().getName(), chest2.getX(), chest2.getY(), chest2.getZ(), 0, args[1]);
 											chestVec.add(found);
@@ -139,10 +151,6 @@ public class Chestindex extends JavaPlugin {
 												if (x == null)
 													continue;
 												if (x.getType().equals(Material.valueOf(searchfor))) {
-													// sendConsole(x.getType() + " - " + x.getAmount());
-													// IndexChest[] found = new IndexChest[];
-													// arrays.put($user, new IndexChest(chest.getX(),chest.getY(), chest.getZ(), x.getAmount()));
-													// sender.sendMessage(0 + ": " + args[1] + " " + found.amount + " stk.");
 													found.amount += x.getAmount();
 												}
 											}
@@ -154,7 +162,7 @@ public class Chestindex extends JavaPlugin {
 								if (!chest.getInventory().contains(Material.valueOf(searchfor)))
 									continue;
 								ItemStack[] inventory = chest.getInventory().getContents();
-								if(!doublechest) {
+								if (!doublechest) {
 									found = new IndexChest(chest.getWorld().getName(), chest.getX(), chest.getY(), chest.getZ(), 0, args[1]);
 									chestVec.add(found);
 								}
@@ -162,10 +170,6 @@ public class Chestindex extends JavaPlugin {
 									if (x == null)
 										continue;
 									if (x.getType().equals(Material.valueOf(searchfor))) {
-										// sendConsole(x.getType() + " - " + x.getAmount());
-										// IndexChest[] found = new IndexChest[];
-										// arrays.put($user, new IndexChest(chest.getX(),chest.getY(), chest.getZ(), x.getAmount()));
-										// sender.sendMessage(0 + ": " + args[1] + " " + found.amount + " stk.");
 										found.amount += x.getAmount();
 									}
 								}
@@ -173,11 +177,20 @@ public class Chestindex extends JavaPlugin {
 								sendConsole(prefix + " Error on handling Chestindex Command search.");
 							}
 						}
-						// Output List
-						for (int y = 0; y < chestVec.size(); y++) {
-							IndexChest chest = chestVec.get(y);
-							sendPlayer(y + ": " + chest.item + " " + chest.amount + " stk.", player);
-						}
+						/*
+						 * for (int y = 0; y < chestVec.size(); y++) { IndexChest chest = chestVec.get(y); sendPlayer(y + ": " + chest.item + " " + chest.amount + " stk.", player); }
+						 */
+
+						// Send first page.
+						sendList(0, chestVec, player);
+					}
+				} else if (args[0].equalsIgnoreCase("list") || args[0].equalsIgnoreCase("l") && isNumeric(args[1])) {
+					try {
+						Vector<IndexChest> chestVec = data.get(sender.getName());
+						int page = ((Integer.parseInt(args[1]) * 10) - 10);
+						sendList(page, chestVec, player);
+					} catch (Exception e) {
+						sendConsole("Error on handling Chestindex Command list.");
 					}
 				} else if (args[0].equalsIgnoreCase("teleport") || args[0].equalsIgnoreCase("tp") && isNumeric(args[1])) {
 					try {
